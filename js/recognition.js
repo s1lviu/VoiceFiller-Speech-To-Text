@@ -1,11 +1,37 @@
-window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-var finalTranscript = '';
-var recognition = new window.SpeechRecognition();
+/*
+ * Copyright (c) 2019.  Silviu Stroe
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+'use strict';
+if (window.SpeechRecognition === undefined) {
+    window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+}
+if (recognition === undefined) {
+    var recognition = new window.SpeechRecognition();
+}
 recognition.interimResults = true;
 recognition.maxAlternatives = 5;
 recognition.continuous = true;
 recognition.lang = config.lang; //passed from background
-
+var finalTranscript = '';
 recognition.onresult = (event) => {
     let interimTranscript = '';
     for (let i = event.resultIndex, len = event.results.length; i < len; i++) {
@@ -29,24 +55,16 @@ recognition.onresult = (event) => {
 
 
 function startRecognition() {
-    // if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") {
     recognition.start();
-    // }
 }
 
 function stopRecognition() {
     recognition.stop();
-    localStorage.setItem("isRecognitionRunning", "no");
 }
 
 
-// recognition.onspeechend = function (e) {
-//     console.log('onspeechend', e);
-//     stopRecognition();
-// };
-
 recognition.onend = function () {
-    localStorage.setItem("isRecognitionRunning", "no");
+    window.isRecognitionOn = false;
     console.log('Speech recognition service disconnected');
 
     var event = document.createEvent('Event');
@@ -54,9 +72,10 @@ recognition.onend = function () {
     document.dispatchEvent(event);
 };
 
+
 recognition.onstart = function () {
+    window.isRecognitionOn = true;
     console.log('Speech recognition service started');
-    localStorage.setItem("isRecognitionRunning", "yes");
 
     var event = document.createEvent('Event');
     event.initEvent('recognitionStarted');
@@ -78,9 +97,8 @@ navigator.permissions.query(
 });
 
 
-if (localStorage.getItem("isRecognitionRunning") !== "yes") {
+if (!window.isRecognitionOn) {
     startRecognition();
 } else {
     stopRecognition();
 }
-
