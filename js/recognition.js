@@ -4,7 +4,8 @@ var recognition = new window.SpeechRecognition();
 recognition.interimResults = true;
 recognition.maxAlternatives = 5;
 recognition.continuous = true;
-recognition.lang = config.lang;
+recognition.lang = config.lang; //passed from background
+
 recognition.onresult = (event) => {
     let interimTranscript = '';
     for (let i = event.resultIndex, len = event.results.length; i < len; i++) {
@@ -13,10 +14,17 @@ recognition.onresult = (event) => {
             finalTranscript += transcript;
         } else {
             interimTranscript += transcript;
-            document.activeElement.value = interimTranscript;
+            //document.activeElement.value = interimTranscript;
+            // document.execCommand("selectAll", true, null);
+            // document.execCommand("insertText", false, interimTranscript || "");
+            // console.log("Intermediar " + interimTranscript);
         }
+
     }
-    document.activeElement.value = finalTranscript;
+    document.execCommand("selectAll", false, null);
+    document.execCommand("insertText", false, finalTranscript || "");
+    // console.log("Final " + finalTranscript);
+    //document.activeElement.value = finalTranscript;
 };
 
 
@@ -31,6 +39,11 @@ function stopRecognition() {
     localStorage.setItem("isRecognitionRunning", "no");
 }
 
+
+// recognition.onspeechend = function (e) {
+//     console.log('onspeechend', e);
+//     stopRecognition();
+// };
 
 recognition.onend = function () {
     localStorage.setItem("isRecognitionRunning", "no");

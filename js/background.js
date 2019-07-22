@@ -3,39 +3,36 @@ async function getSavedLanguage() {
     return data.lang;
 }
 
-
-//open tutorial after installing
-chrome.runtime.onInstalled.addListener(function (object) {
-    chrome.tabs.create({url: "https://silviustroe.com/contact/"});
-});
-
-/*chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-
+function resetIcon() {
     chrome.browserAction.setIcon({
         path: "icons/favicon-32x32.png"
     });
     chrome.browserAction.setBadgeText({
         text: ''
     });
-});*/
+}
+
+function enableRecIcon() {
+    chrome.browserAction.setIcon({
+        path: "icons/recording.png"
+    });
+    chrome.browserAction.setBadgeText({
+        text: 'REC'
+    });
+}
+
+//open tutorial after installing
+chrome.runtime.onInstalled.addListener(function (object) {
+    chrome.tabs.create({url: "https://silviustroe.com/contact/"});
+});
 
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
     if (message === "recognitionEnded") {
-        chrome.browserAction.setIcon({
-            path: "icons/favicon-32x32.png"
-        });
-        chrome.browserAction.setBadgeText({
-            text: ''
-        });
+        resetIcon();
     } else {
-        chrome.browserAction.setIcon({
-            path: "icons/recording.png"
-        });
-        chrome.browserAction.setBadgeText({
-            text: 'REC'
-        });
+        enableRecIcon();
     }
 });
 
@@ -58,13 +55,15 @@ chrome.commands.onCommand.addListener(async function (command) {
 
 });
 
+chrome.tabs.onRemoved.addListener(function (tabid, removed) {
+    if (tabid === currentTabId) {
+        resetIcon();
+    }
+});
+
 chrome.tabs.onUpdated.addListener(async function (updatedTabId) {
     if (updatedTabId === currentTabId) {
-        chrome.browserAction.setIcon({
-            path: "icons/favicon-32x32.png"
-        });
-        chrome.browserAction.setBadgeText({
-            text: ''
-        });
+        resetIcon();
     }
+
 });
