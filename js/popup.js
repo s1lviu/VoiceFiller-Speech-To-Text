@@ -1,21 +1,33 @@
 let version = chrome.runtime.getManifest().version;
-$("#version").append(version + ' alpha');
-$("#options").click(function () {
+
+let paragraph = document.getElementById("version");
+let text = document.createTextNode(version + ' alpha');
+paragraph.appendChild(text);
+
+
+document.getElementById("options").addEventListener("click", function () {
     if (chrome.runtime.openOptionsPage) {
         chrome.runtime.openOptionsPage();
     } else {
         window.open(chrome.runtime.getURL('options.html'));
     }
 });
-$('#poweredBy').on('click', 'a', function () {
-    chrome.tabs.create({url: $(this).attr('href')});
-    return false;
-});
+
+document.getElementById("poweredBy").addEventListener("click", function (e) {
+    e = e || window.event;
+    let target = e.target || e.srcElement,
+        link = target.href;
+    if (link !== undefined)
+        chrome.tabs.create({url: link});
+}, false);
 
 
 chrome.storage.sync.get(['lang'], function (result) {
     let lang = result.lang;
     if (lang) {
-        $('#options').after('<br><b>Congratulations! Language is set to ' + lang + '</b>');
+        let opts = document.getElementById("options");
+        let child = document.createElement("p");
+        child.innerHTML = '<b>Congratulations! Language is set to ' + lang + '</b>';
+        opts.after(child);
     }
 });

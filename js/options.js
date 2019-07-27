@@ -1,6 +1,6 @@
 // Saves options to chrome.storage
 function save_options() {
-    let val = $('select#country').val();
+    let val = document.querySelector("select#country").value;
     chrome.storage.sync.set({
         lang: val
     }, function () {
@@ -13,11 +13,10 @@ function save_options() {
 function restore_options() {
     chrome.storage.sync.get(['lang'], function (result) {
         let lang = result.lang;
-        console.log('Value currently is ' + result.lang);
-
         if (lang !== undefined) {
-            $('select#country').val(lang);
-            $('select').formSelect();
+            document.querySelector("select#country").value = lang;
+            let elems = document.querySelectorAll('select');
+            let instances = M.FormSelect.init(elems);
         }
     });
 }
@@ -25,4 +24,7 @@ function restore_options() {
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('save').addEventListener('click', save_options);
 //init select
-$('select').formSelect();
+document.addEventListener('DOMContentLoaded', function () {
+    let elems = document.querySelectorAll('select');
+    let instances = M.FormSelect.init(elems);
+});
