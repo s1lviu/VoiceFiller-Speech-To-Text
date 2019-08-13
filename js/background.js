@@ -27,7 +27,7 @@ async function getSavedLanguage() {
 
 function resetIcon() {
     chrome.browserAction.setIcon({
-        path: "icons/favicon-32x32.png"
+        path: "icons/favicon48.png"
     });
     chrome.browserAction.setBadgeText({
         text: ''
@@ -45,7 +45,7 @@ function enableRecIcon() {
 
 //open tutorial after installing
 chrome.runtime.onInstalled.addListener(function (object) {
-    chrome.tabs.create({url: "https://silviustroe.com/contact/"});
+    chrome.tabs.create({url: "https://silviustroe.com/voicefiller-chrome-extension-fill-website-forms-with-your-voice/#changelog"});
 });
 
 
