@@ -28,30 +28,36 @@ if (recognition === undefined) {
     var recognition = new window.SpeechRecognition();
 }
 recognition.interimResults = true;
-recognition.maxAlternatives = 5;
 recognition.continuous = true;
 recognition.lang = config.lang; //passed from background
-var finalTranscript = '';
+
+let finalTranscript = '';
 recognition.onresult = (event) => {
     let interimTranscript = '';
     for (let i = event.resultIndex, len = event.results.length; i < len; i++) {
         let transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
             finalTranscript += transcript;
+            document.execCommand("selectAll", false, null);
+            document.execCommand("insertText", false, finalTranscript || "");
         } else {
-            interimTranscript += transcript;
-            //document.activeElement.value = interimTranscript;
-            // document.execCommand("selectAll", true, null);
-            // document.execCommand("insertText", false, interimTranscript || "");
-            // console.log("Intermediar " + interimTranscript);
+            //if we stopped speaking and want to keep the phrase going
+            if (interimTranscript.length === 0 && finalTranscript.length > 0) {
+                interimTranscript += finalTranscript;
+            } else {
+                interimTranscript += transcript;
+            }
+            document.execCommand("selectAll", false, null);
+            document.execCommand("insertText", false, interimTranscript || "");
         }
 
     }
-    document.execCommand("selectAll", false, null);
-    document.execCommand("insertText", false, finalTranscript || "");
-    // console.log("Final " + finalTranscript);
-    //document.activeElement.value = finalTranscript;
 };
+
+//reset transcript when changing elements (like inputs)
+document.addEventListener('focusin', function () {
+    finalTranscript = '';
+}, true);
 
 
 function startRecognition() {

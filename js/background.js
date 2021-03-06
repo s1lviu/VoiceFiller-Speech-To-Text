@@ -44,8 +44,14 @@ function enableRecIcon() {
 }
 
 //open tutorial after installing
-chrome.runtime.onInstalled.addListener(function (object) {
-    chrome.tabs.create({url: "https://silviustroe.com/voicefiller-chrome-extension-fill-website-forms-with-your-voice/#changelog"});
+chrome.runtime.onInstalled.addListener(function (details) {
+    if (details.reason === "install") {
+        //call a function to handle a first install
+        chrome.tabs.create({url: "https://silviustroe.com/voicefiller-chrome-extension-fill-website-forms-with-your-voice/#changelog"});
+    } else if (details.reason === "update") {
+        //call a function to handle an update
+        chrome.tabs.create({url: "https://silviustroe.com/voicefiller-chrome-extension-fill-website-forms-with-your-voice/#changelog"});
+    }
 });
 
 
